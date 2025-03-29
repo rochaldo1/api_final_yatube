@@ -1,10 +1,19 @@
 from rest_framework import serializers
-from rest_framework.relations import SlugRelatedField
 from django.contrib.auth import get_user_model
 from posts.models import Comment, Follow, Group, Post
 
 
 User = get_user_model()
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField(read_only=True)
+    post = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'text', 'author', 'post', 'created')
+        read_only_fields = ('author', 'post', 'created')
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -14,11 +23,8 @@ class GroupSerializer(serializers.ModelSerializer):
 
 
 class FollowSerializer(serializers.ModelSerializer):
-    user = SlugRelatedField(
-        slug_field='username',
-        read_only=True
-    )
-    following = SlugRelatedField(
+    user = serializers.StringRelatedField(read_only=True)
+    following = serializers.SlugRelatedField(
         slug_field='username',
         queryset=User.objects.all()
     )
@@ -44,9 +50,8 @@ class FollowSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
-    author = SlugRelatedField(slug_field='username', read_only=True)
-    group = SlugRelatedField(
-        slug_field='slug',
+    author = serializers.StringRelatedField(read_only=True)
+    group = serializers.PrimaryKeyRelatedField(
         queryset=Group.objects.all(),
         required=False
     )
@@ -55,21 +60,3 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = ('id', 'text', 'author', 'group', 'pub_date')
         read_only_fields = ('author', 'pub_date')
-
-    def validate_text(self, value):
-        if not value.strip():
-            raise serializers.ValidationError("Текст не может быть пустым.")
-        return value
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    author = SlugRelatedField(
-        slug_field='username',
-        read_only=True
-    )
-    post = serializers.PrimaryKeyRelatedField(read_only=True)
-
-    class Meta:
-        model = Comment
-        fields = ('id', 'text', 'author', 'post', 'created')
-        read_only_fields = ('author', 'post', 'created')

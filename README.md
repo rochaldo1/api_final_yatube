@@ -16,6 +16,7 @@ REST API для социальной сети Yatube с функционалом
 - Python 3.9+ 
 - Django 3.2+
 - Django REST Framework 3.12+
+- SQLite 3
 
 ## Установка и запуск
 
