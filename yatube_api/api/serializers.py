@@ -1,7 +1,7 @@
-from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from posts.models import Comment, Follow, Group, Post
+from rest_framework import serializers
 
+from posts.models import Comment, Follow, Group, Post
 
 User = get_user_model()
 
@@ -40,8 +40,8 @@ class FollowSerializer(serializers.ModelSerializer):
                 "Нельзя подписаться на самого себя!"
             )
         if Follow.objects.filter(
-            user=self.context['request'].user,
-            following=data['following']
+                user=self.context['request'].user,
+                following=data['following']
         ).exists():
             raise serializers.ValidationError(
                 "Вы уже подписаны на этого автора"
